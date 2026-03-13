@@ -34,6 +34,10 @@ class WikipediaEnv:
     in sequence (search first, then lookup), which is part of what ReAct learns.
     """
 
+    # Wikipedia API requires a User-Agent header, otherwise it may return
+    # HTML error pages instead of JSON, causing parse failures.
+    HEADERS = {"User-Agent": "ReActAgent/1.0 (educational project)"}
+
     def __init__(self):
         self.current_page = None      # Full text of the current Wikipedia page
         self.current_paragraphs = []  # Paragraphs for lookup
@@ -62,7 +66,7 @@ class WikipediaEnv:
                 "redirects": 1,
                 "format": "json",
             }
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, headers=self.HEADERS, timeout=10)
             data = response.json()
 
             pages = data.get("query", {}).get("pages", {})
@@ -136,7 +140,7 @@ class WikipediaEnv:
                 "limit": 5,
                 "format": "json",
             }
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, headers=self.HEADERS, timeout=10)
             data = response.json()
 
             if len(data) > 1 and data[1]:
