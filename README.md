@@ -79,6 +79,15 @@ python -m eval.run_hotpotqa --n 5
 
 # FEVER — Fact Verification
 python -m eval.run_fever --n 5
+
+# ReAct vs CoT vs Act-only (same subset)
+python -m eval.compare_methods --task both --n 3
+```
+
+## Lightweight Tests
+
+```bash
+python -m unittest discover -s tests -v
 ```
 
 ## Project Structure
@@ -87,14 +96,21 @@ python -m eval.run_fever --n 5
 RE-ACT/
 ├── react_agent/
 │   ├── agent.py          # The ReAct loop (Thought→Action→Observation)
+│   ├── baselines.py      # CoT and Act-only baseline agents
 │   ├── llm.py            # Thin LLM wrapper (Groq/OpenAI)
+│   ├── parsing.py        # Response/action parsing helpers
 │   ├── prompts.py        # Few-shot prompt templates
 │   └── tools.py          # Wikipedia search/lookup environment
 │
 ├── eval/
+│   ├── compare_methods.py# ReAct vs CoT vs Act-only comparison runner
 │   ├── run_hotpotqa.py   # HotpotQA evaluation
 │   ├── run_fever.py      # FEVER evaluation
 │   └── metrics.py        # EM, F1, accuracy
+│
+├── tests/
+│   ├── test_metrics.py   # Unit tests for EM/F1/accuracy logic
+│   └── test_parsing.py   # Unit tests for response parsing
 │
 └── notebooks/
     └── demo.ipynb        # Interactive walkthrough
