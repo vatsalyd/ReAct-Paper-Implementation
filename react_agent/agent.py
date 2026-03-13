@@ -24,10 +24,10 @@ Why this works (the paper's key insight):
     - The thoughts create a "reasoning scaffold" AND the actions provide "grounded verification"
 """
 
-import re
 from .llm import LLMClient
 from .tools import WikipediaEnv
 from .prompts import build_prompt
+from .parsing import parse_thought_action
 
 
 class ReactAgent:
@@ -131,52 +131,7 @@ class ReactAgent:
 
         We need to robustly extract these, handling various formatting quirks.
         """
-        thought = ""
-        action = ""
-        action_input = ""
-
-        # Extract thought — everything before the action line
-        # Match patterns like "Thought 2:" or just lines before "Action"
-        thought_match = re.search(
-            rf'Thought\s*{step}?\s*:\s*(.*?)(?=Action\s*{step}?\s*:)',
-            response,
-            re.DOTALL | re.IGNORECASE,
-        )
-        if thought_match:
-            thought = thought_match.group(1).strip()
-        else:
-            # If no explicit thought marker, everything before Action is the thought
-            action_start = re.search(r'Action\s*\d*\s*:', response, re.IGNORECASE)
-            if action_start:
-                thought = response[:action_start.start()].strip()
-            else:
-                thought = response.strip()
-
-        # Extract action — pattern: Action N: Type[input]
-        action_match = re.search(
-            r'Action\s*\d*\s*:\s*(\w+)\s*\[(.+?)\]',
-            response,
-            re.DOTALL | re.IGNORECASE,
-        )
-        if action_match:
-            action = action_match.group(1).strip()
-            action_input = action_match.group(2).strip()
-        else:
-            # Fallback: try to find just the action type
-            action_match_simple = re.search(
-                r'Action\s*\d*\s*:\s*(\w+)',
-                response,
-                re.IGNORECASE,
-            )
-            if action_match_simple:
-                action = action_match_simple.group(1).strip()
-                action_input = ""
-            else:
-                # No action found — treat as a thought-only step, search for the question topic
-                action = "Search"
-                action_input = thought[:50] if thought else "unknown"
-
-        return thought, action, action_input
+        return parse_thought_action(response, step)
 
     def _format_trajectory(self) -> str:
         """
