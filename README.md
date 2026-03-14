@@ -19,6 +19,38 @@ Goal: understand the ReAct loop clearly, not build a production framework.
   - FEVER-style fact verification
 - Small evaluation scripts on curated subsets
 
+## Visual 1: ReAct Loop
+
+```mermaid
+flowchart TD
+    Q[Question / Claim] --> P[Build Prompt<br/>examples + trajectory]
+    P --> LLM[LLM: Thought + Action]
+    LLM --> Parse[Parse Action]
+    Parse -->|Search / Lookup| Tool[WikipediaEnv]
+    Tool --> Obs[Observation]
+    Obs --> P
+    Parse -->|Finish[answer]| Done[Return Final Answer]
+```
+
+## Visual 2: Example Trajectory
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Agent
+    participant Wiki
+
+    User->>Agent: What is the capital of France?
+    Agent->>Agent: Thought 1
+    Agent->>Wiki: Search[France]
+    Wiki-->>Agent: Observation 1
+    Agent->>Agent: Thought 2
+    Agent->>Wiki: Lookup[capital]
+    Wiki-->>Agent: Observation 2 (Paris...)
+    Agent->>Agent: Action 3 = Finish[Paris]
+    Agent-->>User: Paris
+```
+
 ## Project structure
 
 ```text
@@ -56,6 +88,12 @@ GROQ_API_KEY=your_key_here
 
 ```bash
 python -c "from react_agent import ReactAgent; a=ReactAgent(task='hotpotqa'); ans,trace=a.run('What is the capital of France?'); print(ans)"
+```
+
+If you want to see the full step-by-step reasoning trace:
+
+```bash
+python -c "from react_agent import ReactAgent; a=ReactAgent(task='hotpotqa'); ans,trace=a.run('What is the capital of France?'); a.print_trace()"
 ```
 
 ## Evaluation
