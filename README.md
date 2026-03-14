@@ -29,7 +29,7 @@ flowchart TD
     Parse -->|Search / Lookup| Tool[WikipediaEnv]
     Tool --> Obs[Observation]
     Obs --> P
-    Parse -->|Finish[answer]| Done[Return Final Answer]
+    Parse -->|Finish| Done[Return Final Answer]
 ```
 
 ## Visual 2: Example Trajectory
