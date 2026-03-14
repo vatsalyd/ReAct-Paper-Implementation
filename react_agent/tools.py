@@ -38,6 +38,7 @@ class WikipediaEnv:
             "action": "query",
             "titles": entity,
             "prop": "extracts",
+            "exintro": True,
             "explaintext": True,
             "redirects": 1,
             "format": "json",
