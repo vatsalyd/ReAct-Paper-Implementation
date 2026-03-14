@@ -46,7 +46,7 @@ RE-ACT/
 pip install -r requirements.txt
 ```
 
-Create `.env` from `.env.example` and set your key:
+Create `.env` and set your key:
 
 ```env
 GROQ_API_KEY=your_key_here
